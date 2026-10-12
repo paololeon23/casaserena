@@ -17,8 +17,13 @@
   }
 }
 
-section[id] {
+section[id],
+#nombre,
+#noches-reserva,
+#huespedes-reserva,
+#aviso-reserva {
   scroll-margin-top: 8.5rem;
+  scroll-margin-bottom: 8.5rem;
 }
 
 @media (max-width: 767px) {

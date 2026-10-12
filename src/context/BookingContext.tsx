@@ -148,16 +148,18 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       setNote,
       setAccepted,
       onReserveClick: (event) => {
+        if (whatsappReady && liveIssues.length === 0 && href) return;
+        event.preventDefault();
         setAttempted(true);
         if (!whatsappReady) {
-          event.preventDefault();
           scrollToId("contacto");
           return;
         }
-        if (liveIssues.length > 0 || !href) {
-          event.preventDefault();
-          scrollToId("reservar");
-        }
+        const field = liveIssues[0]?.field;
+        const target =
+          field === "guestName" ? "nombre" : field === "guests" ? "huespedes-reserva" : "noches-reserva";
+        scrollToId(target);
+        window.setTimeout(() => document.getElementById(target)?.focus(), 250);
       },
     }),
     [

@@ -82,7 +82,7 @@ describe("fechas", () => {
 });
 
 describe("validación y WhatsApp", () => {
-  it("exige fechas, nombre, huéspedes y la aclaración", () => {
+  it("exige noches, huéspedes, una fecha libre y el nombre", () => {
     const issues = validateBooking(
       draft({
         checkIn: null,
@@ -93,13 +93,11 @@ describe("validación y WhatsApp", () => {
       }),
       today,
     );
-    expect(issues.map((issue) => issue.field)).toEqual([
-      "checkIn",
-      "checkOut",
-      "guests",
+    expect(issues.map((issue) => issue.field)).toEqual(["checkIn", "checkOut", "guests", "guestName"]);
+    expect(validateBooking(draft({ guestName: "", accepted: false }), today).map((issue) => issue.field)).toEqual([
       "guestName",
-      "accepted",
     ]);
+    expect(validateBooking(draft({ accepted: false }), today)).toEqual([]);
   });
 
   it("impide que la salida sea el mismo día o una fecha pasada", () => {
@@ -135,10 +133,11 @@ describe("validación y WhatsApp", () => {
     expect(message.toLowerCase()).not.toContain("está disponible");
   });
 
-  it("usa Sin preferencia y deja vacía la consulta si no hay datos", () => {
-    const message = buildReservationMessage(draft({ roomName: "  ", note: "  " }));
+  it("usa Sin preferencia y omite nombre y consulta si no hay datos", () => {
+    const message = buildReservationMessage(draft({ roomName: "  ", note: "  ", guestName: "  " }));
     expect(message).toContain("Habitación: Sin preferencia");
-    expect(message).toContain("Consulta adicional: \n");
+    expect(message).not.toContain("Consulta adicional");
+    expect(message).not.toContain("Nombre:");
   });
 
   it("codifica el enlace de WhatsApp y avisa si el número no está listo", () => {
