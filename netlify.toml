@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Las rutas que no son un archivo real vuelven a la página.
+# Los videos, fotos y JavaScript de dist se sirven tal cual.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
