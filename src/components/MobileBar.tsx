@@ -17,7 +17,9 @@ export function MobileBar() {
       >
         Reservar por WhatsApp
       </a>
-      <p className="mt-1.5 text-center text-[10px] tracking-wide text-ink/60">Enviar la solicitud no confirma la reserva.</p>
+      <p className="mt-1.5 text-center text-[10px] tracking-wide text-ink/60">
+        {booking.attempted && booking.issues[0] ? booking.issues[0].message : "Enviar la solicitud no confirma la reserva."}
+      </p>
     </div>
   );
 }

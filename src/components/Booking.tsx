@@ -126,22 +126,26 @@ export function Booking() {
 
             <FieldError id="error-huespedes" message={issue("guests")} />
 
-            <label className="mt-4 block text-sm font-semibold" htmlFor="habitacion">
-              Habitación
-            </label>
-            <select
-              id="habitacion"
-              className="field mt-2"
-              value={booking.roomId}
-              onChange={(event) => booking.setRoomId(event.target.value)}
-            >
-              <option value="">Sin preferencia</option>
-              {rooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.name}
-                </option>
-              ))}
-            </select>
+            {rooms.length > 1 ? (
+              <>
+                <label className="mt-4 block text-sm font-semibold" htmlFor="habitacion">
+                  Habitación
+                </label>
+                <select
+                  id="habitacion"
+                  className="field mt-2"
+                  value={booking.roomId}
+                  onChange={(event) => booking.setRoomId(event.target.value)}
+                >
+                  <option value="">Sin preferencia</option>
+                  {rooms.map((room) => (
+                    <option key={room.id} value={room.id}>
+                      {room.name}
+                    </option>
+                  ))}
+                </select>
+              </>
+            ) : null}
             {selected?.isExample ? (
               <p className="mt-2 text-sm text-ink/70">Esta ficha es de ejemplo. Ese nombre viajará en el mensaje.</p>
             ) : null}
@@ -154,25 +158,13 @@ export function Booking() {
               className="field mt-2"
               autoComplete="name"
               maxLength={80}
+              placeholder="Tu nombre"
               value={booking.guestName}
               aria-invalid={Boolean(issue("guestName"))}
               aria-describedby={issue("guestName") ? "error-nombre" : undefined}
               onChange={(event) => booking.setGuestName(event.target.value)}
             />
             <FieldError id="error-nombre" message={issue("guestName")} />
-
-            <label className="mt-4 block text-sm font-semibold" htmlFor="consulta">
-              Consulta adicional
-            </label>
-            <textarea
-              id="consulta"
-              className="field mt-2 min-h-24 resize-y"
-              maxLength={500}
-              value={booking.note}
-              onChange={(event) => booking.setNote(event.target.value)}
-            />
-            <p className="mt-1 text-xs text-ink/70">{booking.note.trim().length}/500</p>
-            <FieldError id="error-consulta" message={issue("note")} />
 
             {estimate != null ? (
               <p className="mt-3 text-sm leading-relaxed">
@@ -181,17 +173,6 @@ export function Booking() {
             ) : (
               <p className="mt-3 text-sm text-ink/70">El precio total se confirma por WhatsApp.</p>
             )}
-
-            <label className="mt-4 flex items-start gap-3 text-sm leading-relaxed">
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 accent-ink"
-                checked={booking.accepted}
-                onChange={(event) => booking.setAccepted(event.target.checked)}
-              />
-              <span>Leí los términos. Enviar esta solicitud no confirma la reserva, ni garantiza el precio ni las fechas.</span>
-            </label>
-            <FieldError id="error-aviso" message={issue("accepted")} />
 
             {booking.issues.length > 0 ? (
               <div className="mt-4 rounded-2xl bg-paper px-4 py-3 text-sm" role="alert">
@@ -214,7 +195,7 @@ export function Booking() {
               className="mt-4 flex w-full items-center justify-center rounded-full bg-ink px-5 py-3.5 text-center text-base font-bold text-white"
               onClick={booking.onReserveClick}
             >
-              Solicitar reserva
+              Reservar por WhatsApp
             </a>
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/60">
               Número usado: {fullWhatsappNumber() || "sin configurar"}. Enviar el mensaje no deja la reserva confirmada.

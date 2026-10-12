@@ -57,17 +57,6 @@ export function validateBooking(draft: BookingDraft, today: string): BookingIssu
     issues.push({ field: "guestName", message: "El nombre admite hasta 80 caracteres." });
   }
 
-  if (draft.note.trim().length > 500) {
-    issues.push({ field: "note", message: "La consulta adicional admite hasta 500 caracteres." });
-  }
-
-  if (!draft.accepted) {
-    issues.push({
-      field: "accepted",
-      message: "Confirma que la solicitud no deja la reserva hecha.",
-    });
-  }
-
   return issues;
 }
 
@@ -83,19 +72,21 @@ export function stayNights(draft: Pick<BookingDraft, "checkIn" | "checkOut">): n
 export function buildReservationMessage(draft: BookingDraft): string {
   const nights = stayNights(draft);
   const room = draft.roomName.trim() || "Sin preferencia";
-  return [
+  const lines = [
     "Hola, Casa Serena Otuzco. Quisiera consultar la disponibilidad para una reserva.",
     "",
-    `Nombre: ${draft.guestName.trim()}`,
     `Habitación: ${room}`,
     `Fecha de ingreso: ${draft.checkIn ? formatLong(draft.checkIn) : ""}`,
     `Fecha de salida: ${draft.checkOut ? formatLong(draft.checkOut) : ""}`,
     `Cantidad de huéspedes: ${draft.guests}`,
     `Cantidad de noches: ${nights ?? ""}`,
-    `Consulta adicional: ${draft.note.trim()}`,
-    "",
-    "¿Podrían confirmarme la disponibilidad y el precio total, por favor?",
-  ].join("\n");
+  ];
+  const name = draft.guestName.trim();
+  if (name) lines.push(`Nombre: ${name}`);
+  const note = draft.note.trim();
+  if (note) lines.push(`Consulta adicional: ${note}`);
+  lines.push("", "¿Podrían confirmarme la disponibilidad y el precio total, por favor?");
+  return lines.join("\n");
 }
 
 export function whatsappDigits(phone: string): string {
