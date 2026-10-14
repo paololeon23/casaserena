@@ -4,7 +4,7 @@ import { brand, showingExamples } from "../config/site";
 import { scrollToId } from "../lib/ui";
 
 const links = [
-  { id: "habitaciones", label: "Habitación" },
+  { id: "habitaciones", label: "Habitaciones" },
   { id: "reservar", label: "Fechas" },
   { id: "ubicacion", label: "Mapa" },
   { id: "terminos", label: "Términos" },

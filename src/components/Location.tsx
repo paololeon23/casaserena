@@ -1,4 +1,4 @@
-import { brand, contact, mapsDirectionsUrl, mapsEmbedSrc } from "../config/site";
+import { contact, mapsDirectionsUrl, mapsEmbedSrc } from "../config/site";
 import { Container, PendingNote, SectionHeading } from "./ui";
 
 export function Location() {
@@ -11,7 +11,7 @@ export function Location() {
         <SectionHeading
           eyebrow="Dónde queda"
           title="Otuzco"
-          text={`${brand.name} está en Otuzco. El mapa muestra la ciudad. La dirección de la puerta se confirma al reservar.`}
+          text="Este es el punto exacto de Casa Serena en Otuzco."
         />
         <div className="mx-auto mt-12 max-w-3xl text-center">
           {contact.address ? (
@@ -20,12 +20,12 @@ export function Location() {
             <PendingNote>Dirección pendiente. No se usó una ubicación aproximada.</PendingNote>
           )}
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed">
-            No hay una calle publicada en las fotos ni en los videos, así que el mapa no marca una puerta inventada.
+            El mapa usa el punto que Casa Serena compartió. La llegada se coordina por WhatsApp si hace falta un detalle más.
           </p>
           <div className="mt-8 min-h-[420px] overflow-hidden rounded-[1.4rem] bg-[#E7EEE3] text-left text-ink">
             {embed ? (
               <iframe
-                title="Mapa de Otuzco, donde está Casa Serena"
+                title="Punto exacto de Casa Serena en Otuzco"
                 src={embed}
                 className="h-full min-h-[420px] w-full border-0"
                 loading="lazy"

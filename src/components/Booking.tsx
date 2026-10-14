@@ -1,14 +1,13 @@
 import { Minus, Plus } from "lucide-react";
 import {
   currency,
-  formMaxGuests,
   fullWhatsappNumber,
   publishedRooms,
   whatsappDisplay,
 } from "../config/site";
 import { useBooking } from "../context/BookingContext";
 import { countLabel, estimateStay, formatMoney, stayNights } from "../lib/booking";
-import { formatCompact, formatLong } from "../lib/dates";
+import { formatLong } from "../lib/dates";
 import { Calendar } from "./Calendar";
 import { Container, FieldError, SectionHeading } from "./ui";
 
@@ -26,39 +25,31 @@ export function Booking() {
         <SectionHeading
           eyebrow="Tus fechas"
           title="Elige el ingreso y la salida"
-          text="Marca las noches en el calendario. La solicitud se abre en WhatsApp y Casa Serena te confirma disponibilidad y precio."
+          text="Primero la habitación y las noches libres. Después tu nombre, DNI y celular. Con eso se abre WhatsApp."
         />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-[1.4rem] border border-line bg-white p-5">
-            <p id="noches-reserva" className="text-[11px] font-medium uppercase tracking-[0.16em]">
-              ¿Cuántas noches?
-            </p>
-            <div className="mt-4 flex items-center justify-between gap-3" role="group" aria-labelledby="noches-reserva">
+        <div id="habitaciones-reserva" className="mt-8 grid gap-3 sm:grid-cols-2">
+          {rooms.map((room) => {
+            const active = booking.roomId === room.id;
+            return (
               <button
+                key={room.id}
                 type="button"
-                className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
-                aria-label="Menos noches"
-                onClick={() => booking.setNights((nights ?? 1) - 1)}
+                aria-pressed={active}
+                className={`rounded-[1.4rem] border px-5 py-4 text-left ${active ? "border-ink bg-ink text-white" : "border-line bg-white"}`}
+                onClick={() => booking.setRoomId(room.id)}
               >
-                <Minus aria-hidden="true" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.16em]">{room.kind}</span>
+                <span className="mt-1 block font-display text-3xl tracking-[-0.03em]">{room.name}</span>
+                <span className={`mt-1 block text-sm ${active ? "text-white/85" : "text-ink/70"}`}>
+                  {room.bedType}. {room.capacity} personas.
+                </span>
               </button>
-              <p className="font-display text-4xl tracking-[-0.03em]">{nights == null ? "Elige" : countLabel(nights, "noche", "noches")}</p>
-              <button
-                type="button"
-                className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
-                aria-label="Más noches"
-                onClick={() => booking.setNights((nights ?? 0) + 1)}
-              >
-                <Plus aria-hidden="true" />
-              </button>
-            </div>
-            <p className="mt-3 text-sm">
-              {booking.checkIn && booking.checkOut
-                ? `${formatCompact(booking.checkIn)} al ${formatCompact(booking.checkOut)}`
-                : "Suma noches o márcalas en el calendario."}
-            </p>
-          </div>
-          <div className="rounded-[1.4rem] border border-line bg-white p-5">
+            );
+          })}
+        </div>
+        <FieldError id="error-habitacion" message={issue("roomId")} />
+        <div className="mt-4">
+          <div className="rounded-[1.4rem] border border-line bg-white p-5 sm:max-w-md">
             <p id="huespedes-reserva" className="text-[11px] font-medium uppercase tracking-[0.16em]">
               ¿Cuántos huéspedes?
             </p>
@@ -81,14 +72,7 @@ export function Booking() {
                 <Plus aria-hidden="true" />
               </button>
             </div>
-            <p className="mt-3 text-sm">
-              {selected?.capacity
-                ? `Esta habitación es para ${selected.capacity} ${selected.capacity === 1 ? "persona" : "personas"}.`
-                : `Puedes indicar hasta ${formMaxGuests}.`}
-              {selected?.capacity && booking.guests > selected.capacity
-                ? " Son más de las que caben: confírmalo por WhatsApp."
-                : ""}
-            </p>
+            <p className="mt-3 text-sm">Mínimo 2 personas. Máximo 4.</p>
           </div>
         </div>
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
@@ -126,30 +110,6 @@ export function Booking() {
 
             <FieldError id="error-huespedes" message={issue("guests")} />
 
-            {rooms.length > 1 ? (
-              <>
-                <label className="mt-4 block text-sm font-semibold" htmlFor="habitacion">
-                  Habitación
-                </label>
-                <select
-                  id="habitacion"
-                  className="field mt-2"
-                  value={booking.roomId}
-                  onChange={(event) => booking.setRoomId(event.target.value)}
-                >
-                  <option value="">Sin preferencia</option>
-                  {rooms.map((room) => (
-                    <option key={room.id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </select>
-              </>
-            ) : null}
-            {selected?.isExample ? (
-              <p className="mt-2 text-sm text-ink/70">Esta ficha es de ejemplo. Ese nombre viajará en el mensaje.</p>
-            ) : null}
-
             <label className="mt-4 block text-sm font-semibold" htmlFor="nombre">
               Nombre
             </label>
@@ -165,6 +125,40 @@ export function Booking() {
               onChange={(event) => booking.setGuestName(event.target.value)}
             />
             <FieldError id="error-nombre" message={issue("guestName")} />
+
+            <label className="mt-4 block text-sm font-semibold" htmlFor="dni">
+              DNI
+            </label>
+            <input
+              id="dni"
+              className="field mt-2"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={8}
+              placeholder="8 dígitos"
+              value={booking.dni}
+              aria-invalid={Boolean(issue("dni"))}
+              aria-describedby={issue("dni") ? "error-dni" : undefined}
+              onChange={(event) => booking.setDni(event.target.value)}
+            />
+            <FieldError id="error-dni" message={issue("dni")} />
+
+            <label className="mt-4 block text-sm font-semibold" htmlFor="celular">
+              Celular
+            </label>
+            <input
+              id="celular"
+              className="field mt-2"
+              inputMode="tel"
+              autoComplete="tel"
+              maxLength={9}
+              placeholder="9 dígitos"
+              value={booking.phone}
+              aria-invalid={Boolean(issue("phone"))}
+              aria-describedby={issue("phone") ? "error-celular" : undefined}
+              onChange={(event) => booking.setPhone(event.target.value)}
+            />
+            <FieldError id="error-celular" message={issue("phone")} />
 
             {estimate != null ? (
               <p className="mt-3 text-sm leading-relaxed">
@@ -200,16 +194,6 @@ export function Booking() {
             <p className="mt-3 text-center text-xs leading-relaxed text-ink/60">
               Número usado: {fullWhatsappNumber() || "sin configurar"}. Enviar el mensaje no deja la reserva confirmada.
             </p>
-
-            <details className="mt-4">
-              <summary className="cursor-pointer text-sm font-semibold">Ver mensaje de WhatsApp</summary>
-              <pre className="mt-3 whitespace-pre-wrap rounded-2xl bg-paper p-4 font-sans text-sm leading-relaxed">{booking.message}</pre>
-            </details>
-            {booking.checkIn || booking.checkOut ? (
-              <button type="button" className="mt-3 text-sm font-semibold underline" onClick={booking.clearDates}>
-                Limpiar fechas
-              </button>
-            ) : null}
           </form>
         </div>
       </Container>

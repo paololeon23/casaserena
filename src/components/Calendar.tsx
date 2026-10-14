@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { activeAvailabilityProvider } from "../lib/availability";
+import { statusForDate } from "../lib/availability";
 import { useBooking } from "../context/BookingContext";
 import {
   addDays,
@@ -66,7 +66,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
         <div role="grid" aria-label={formatMonth(year, month)} className="mt-2 grid grid-cols-7">
           {monthWeeks(year, month).flat().map((iso, index) => {
             if (!iso) return <div key={`empty-${year}-${month}-${index}`} />;
-            const status = activeAvailabilityProvider.statusFor(iso, today);
+            const status = statusForDate(iso, today, booking.occupiedNights);
             const past = status === "past";
             const occupied = status === "occupied";
             const blocked = past || occupied;
@@ -76,7 +76,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
             const isToday = iso === today;
             const labelParts = [formatLong(iso)];
             if (past) labelParts.push("fecha pasada, no se puede seleccionar");
-            else if (occupied) labelParts.push("noche ocupada de ejemplo, no se puede seleccionar");
+            else if (occupied) labelParts.push("reservado, no se puede seleccionar");
             else if (start) labelParts.push("fecha de ingreso");
             else if (end) labelParts.push("fecha de salida");
             else if (inside) labelParts.push("dentro de las noches elegidas");
@@ -138,7 +138,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
   if (months === 2) visible.push(nextCursor);
 
   return (
-    <div className="rounded-[1.4rem] border border-line bg-white p-4 sm:p-6">
+    <div id="calendario" className="rounded-[1.4rem] border border-line bg-white p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
         <button
           type="button"
@@ -170,7 +170,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
         </li>
         <li className="flex items-center gap-2">
           <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E7EEE3] text-[10px] line-through">2</span>
-          Ocupada, ejemplo
+          Reservado
         </li>
         <li className="flex items-center gap-2">
           <span className="inline-flex h-5 w-5 items-center justify-center rounded-full ring-1 ring-ink text-[10px]">3</span>
@@ -183,7 +183,13 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
         </p>
       ) : null}
       <p className="mt-3 text-sm leading-relaxed">
-        Las noches tachadas son un ejemplo para ver el calendario. No son reservas reales. Casa Serena confirma la disponibilidad por WhatsApp.
+        {booking.calendarState === "error"
+          ? "No pude leer la hoja. No tomes estas fechas como libres. Confírmalas por WhatsApp."
+          : booking.calendarState === "sin-enlace"
+            ? "Las noches reservadas aparecen aquí cuando la hoja de Casa Serena está conectada. Hasta entonces, la confirmación es por WhatsApp."
+            : booking.roomId
+              ? "Una noche tachada está reservada. El nombre no se muestra. La salida no cuenta como noche ocupada."
+              : "Elige AURA o ALMA para ver qué noches están reservadas en esa habitación."}
       </p>
     </div>
   );

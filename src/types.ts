@@ -7,6 +7,7 @@ export type Room = {
   id: string;
   isExample: boolean;
   name: string;
+  kind: string;
   summary: string;
   capacity: number | null;
   bedType: string;

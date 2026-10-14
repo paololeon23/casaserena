@@ -1,4 +1,4 @@
-import { brand, contact, fullWhatsappNumber, whatsappDisplay, whatsappSource } from "../config/site";
+import { brand, fullWhatsappNumber, whatsappDisplay, whatsappSource } from "../config/site";
 import { Container, PendingNote, SectionHeading } from "./ui";
 
 function isReady(phone: string) {
@@ -14,7 +14,7 @@ export function Contact() {
     <section id="contacto" className="scroll-mt-24 border-t border-line py-24 md:py-32">
       <Container>
         <SectionHeading eyebrow="Escribir" title="Contacto" text="La reserva se conversa por WhatsApp. Esta página no cobra." />
-        <div className="mt-12 grid gap-10 md:grid-cols-3">
+        <div className="mt-12 grid gap-10 md:grid-cols-2">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink/55">WhatsApp</p>
             {ready && href ? (
@@ -36,18 +36,6 @@ export function Contact() {
               @{brand.tiktokHandle}
             </a>
             <p className="mt-3 text-sm text-ink/65">{brand.publicName}</p>
-          </div>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink/55">Correo</p>
-            {contact.email ? (
-              <a className="mt-3 block font-display text-3xl tracking-[-0.03em]" href={`mailto:${contact.email}`}>
-                {contact.email}
-              </a>
-            ) : (
-              <div className="mt-3">
-                <PendingNote>Correo pendiente.</PendingNote>
-              </div>
-            )}
           </div>
         </div>
       </Container>

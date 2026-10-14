@@ -24,7 +24,7 @@ export function Hero() {
                 <span className="sr-only"> {brand.name}</span>
               </h1>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-white sm:text-base">
-                Habitación doble, dos camas y baño privado. Elige tus fechas y mira dónde queda.
+                Matrimonial AURA y doble ALMA. Dos personas en cada una. Elige la fecha libre.
               </p>
             </div>
           </div>

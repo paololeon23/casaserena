@@ -19,9 +19,11 @@
 
 section[id],
 #nombre,
-#noches-reserva,
+#dni,
+#celular,
+#calendario,
 #huespedes-reserva,
-#aviso-reserva {
+#habitaciones-reserva {
   scroll-margin-top: 8.5rem;
   scroll-margin-bottom: 8.5rem;
 }

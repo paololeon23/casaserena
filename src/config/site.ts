@@ -43,11 +43,18 @@ export const whatsappSource =
 export const contact = {
   email: "",
   address: "Otuzco, La Libertad, Perú",
-  latitude: null as number | null,
-  longitude: null as number | null,
-  mapEmbedUrl: "",
-  googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=Otuzco%2C%20La%20Libertad%2C%20Per%C3%BA",
+  latitude: -7.9035368,
+  longitude: -78.5629959,
+  mapEmbedUrl: "https://maps.google.com/maps?q=-7.9035368,-78.5629959&z=17&output=embed",
+  googleMapsUrl: "https://maps.app.goo.gl/a7vh6eCLc6vVzhTj8",
 };
+
+/**
+ * Aplicación web de Google Apps Script.
+ * La página lee la hoja Calendario y guarda cada consulta en la hoja Registros.
+ */
+export const appsScriptUrl =
+  "https://script.google.com/macros/s/AKfycby0Byjy1GYKkWRqTsEwftYUmiEHRDnYoN9UaSxB4PZkUe9k5XW0WMjaev5AwuLhrDov/exec";
 
 export const stay = {
   checkInTime: "",
@@ -56,8 +63,9 @@ export const stay = {
   cancellationPolicy: "",
 };
 
-/** Límite del formulario. No representa la capacidad real del alojamiento. */
-export const formMaxGuests = 10;
+/** El formulario admite de 2 a 4 personas. */
+export const formMinGuests = 2;
+export const formMaxGuests = 4;
 export const defaultGuests = 2;
 export const currency = "PEN";
 
@@ -68,9 +76,8 @@ export const currency = "PEN";
  */
 export const showExampleRooms = false;
 
-export const heroImage = "/media/habitacion.jpg";
-export const heroImageAlt =
-  "Habitación doble de Casa Serena en Otuzco, con dos camas, luz natural y decoración en verde.";
+export const heroImage = "/media/aura/01.jpg";
+export const heroImageAlt = "Habitación matrimonial AURA de Casa Serena, con una cama amplia y luz de la ventana.";
 
 export const gallery: MediaImage[] = [
   {
@@ -102,20 +109,37 @@ export const publicUrl = "";
 
 export const realRooms: Room[] = [
   {
-    id: "doble",
+    id: "aura",
     isExample: false,
-    name: "Habitación doble",
-    summary:
-      "Si buscabas dónde quedarte en Otuzco, encontraste. Dos camas, decoración propia y baño privado.",
+    name: "AURA",
+    kind: "Matrimonial",
+    summary: "Una cama matrimonial, baño privado, TV y un rincón con cafetera. Para 2 personas.",
     capacity: 2,
-    bedType: "Dos camas",
-    amenities: ["Baño privado", "TV", "Decoración"],
+    bedType: "Una cama matrimonial",
+    amenities: ["Cama matrimonial", "Baño privado", "TV", "Cafetera"],
     pricePerNight: null,
     images: [
-      {
-        src: "/media/habitacion.jpg",
-        alt: "Habitación doble de Casa Serena con dos camas vestidas de blanco y verde.",
-      },
+      { src: "/media/aura/01.jpg", alt: "Habitación AURA con cama matrimonial, mesa y ventana." },
+      { src: "/media/aura/04.jpg", alt: "Baño de la habitación AURA, con lavatorio y espejo iluminado." },
+      { src: "/media/aura/03.jpg", alt: "Televisor de la habitación AURA." },
+      { src: "/media/aura/02.jpg", alt: "Mesa y cafetera de la habitación AURA." },
+    ],
+  },
+  {
+    id: "alma",
+    isExample: false,
+    name: "ALMA",
+    kind: "Doble",
+    summary: "Dos camas, baño privado y un sillón. Para 2 personas.",
+    capacity: 2,
+    bedType: "Dos camas",
+    amenities: ["Dos camas", "Baño privado", "Sillón"],
+    pricePerNight: null,
+    images: [
+      { src: "/media/alma/01.jpg", alt: "Habitación ALMA con dos camas, cuadros y un sillón." },
+      { src: "/media/alma/04.jpg", alt: "Las dos camas de la habitación ALMA." },
+      { src: "/media/alma/02.jpg", alt: "Baño de la habitación ALMA, con lavatorio e inodoro." },
+      { src: "/media/alma/03.jpg", alt: "Sillón de la habitación ALMA." },
     ],
   },
 ];
@@ -124,6 +148,7 @@ export const exampleRooms: Room[] = [
   {
     id: "ejemplo-1",
     isExample: true,
+    kind: "Ejemplo",
     name: "Habitación principal (ejemplo)",
     summary:
       "Ficha de ejemplo para revisar el diseño. Sustitúyela por el nombre, las fotos y los datos reales.",
@@ -136,6 +161,7 @@ export const exampleRooms: Room[] = [
   {
     id: "ejemplo-2",
     isExample: true,
+    kind: "Ejemplo",
     name: "Segunda habitación (ejemplo)",
     summary:
       "Segunda ficha de ejemplo. No describe una habitación real de Casa Serena.",
@@ -165,7 +191,7 @@ export const highlights: Highlight[] = [
   },
   {
     title: "En Otuzco",
-    text: "Se anuncia como un refugio en Otuzco. La dirección exacta todavía no está publicada en esta web.",
+    text: "El mapa de esta página marca el punto exacto publicado por Casa Serena.",
     source: "Bio de TikTok",
   },
 ];
@@ -182,7 +208,7 @@ export const faqs: FaqItem[] = [
   {
     question: "¿El calendario muestra noches libres?",
     answer:
-      "Las fechas tachadas son un ejemplo de noches ocupadas, para que veas cómo se verá. No son reservas reales. La disponibilidad de verdad la confirma Casa Serena por WhatsApp.",
+      "Una noche tachada está reservada. No se muestra el nombre de quien la tomó. La salida no se duerme: del 14 al 16 se ocupan el 14 y el 15. La reserva queda firme cuando Casa Serena la confirma por WhatsApp.",
   },
   {
     question: "¿Puedo pagar por esta página?",

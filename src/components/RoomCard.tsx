@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { currency } from "../config/site";
 import { useBooking } from "../context/BookingContext";
 import { formatMoney } from "../lib/booking";
@@ -12,48 +11,34 @@ export function RoomCard({ room, mark }: { room: Room; mark: string }) {
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const total = room.images.length;
-  const current = room.images[index];
-
-  function move(step: number) {
-    if (total < 2) return;
-    setIndex((value) => (value + step + total) % total);
-  }
 
   return (
-    <article className="group overflow-hidden rounded-[1.4rem] border border-line bg-white">
-      <div className="relative aspect-[4/3] bg-[#E7EEE3] sm:aspect-[16/10]">
-        <Photo src={current?.src} alt={current?.alt ?? `Fotografía pendiente de ${room.name}`} mark={mark} />
+    <article className="overflow-hidden rounded-[1.4rem] border border-line bg-white">
+      <div className="grid grid-cols-2 gap-0.5 bg-[#E7EEE3]">
         {total > 0 ? (
-          <button type="button" className="absolute inset-0" aria-label={`Abrir fotos de ${room.name}`} onClick={() => setOpen(true)} />
-        ) : null}
-        {room.isExample ? (
-          <span className="absolute left-4 top-4 z-10 rounded-full bg-white/90 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-ink">
-            Ejemplo
-          </span>
-        ) : null}
-        {total > 1 ? (
-          <>
+          room.images.map((image, imageIndex) => (
             <button
+              key={image.src}
               type="button"
-              className="absolute left-3 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink"
-              aria-label="Imagen anterior"
-              onClick={() => move(-1)}
+              className="relative aspect-[3/4] overflow-hidden"
+              aria-label={`Abrir foto ${imageIndex + 1} de ${room.name}`}
+              onClick={() => {
+                setIndex(imageIndex);
+                setOpen(true);
+              }}
             >
-              <ChevronLeft size={18} aria-hidden="true" />
+              <Photo src={image.src} alt={image.alt} mark={imageIndex === 0 ? mark : undefined} priority={imageIndex === 0} />
             </button>
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink"
-              aria-label="Imagen siguiente"
-              onClick={() => move(1)}
-            >
-              <ChevronRight size={18} aria-hidden="true" />
-            </button>
-          </>
-        ) : null}
+          ))
+        ) : (
+          <div className="col-span-2 aspect-[4/3]">
+            <Photo alt={`Fotografía pendiente de ${room.name}`} mark={mark} />
+          </div>
+        )}
       </div>
       <div className="p-5 sm:p-6">
-        <h3 className="font-display text-[1.7rem] leading-none tracking-[-0.03em]">{room.name}</h3>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-ink/70">{room.kind}</p>
+        <h3 className="mt-1 font-display text-[1.7rem] leading-none tracking-[-0.03em]">{room.name}</h3>
         <p className="mt-3 text-sm leading-relaxed text-ink/70">{room.summary}</p>
         <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm">
           <div>

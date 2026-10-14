@@ -17,7 +17,7 @@ export function Faq() {
     {
       question: "¿Dónde está Casa Serena?",
       answer:
-        "En Otuzco, La Libertad. El mapa de la página muestra la ciudad. La dirección de la puerta se confirma al reservar.",
+        "En Otuzco, La Libertad. El mapa de la página marca el punto exacto de Casa Serena.",
     },
   ];
 

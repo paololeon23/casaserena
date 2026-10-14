@@ -7,7 +7,6 @@ const checklist = [
   "Reemplazar las habitaciones de ejemplo.",
   "Completar horarios de ingreso y salida.",
   "Redactar reserva y cancelación.",
-  "Agregar el correo, si existe.",
 ];
 
 export function Footer() {

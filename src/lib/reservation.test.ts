@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeAvailabilityProvider } from "./availability";
+import { nightsOfStay, statusForDate, stayCrossesOccupied } from "./availability";
 import {
   buildReservationMessage,
   buildWhatsappLink,
@@ -19,11 +19,13 @@ function draft(overrides: Partial<BookingDraft> = {}): BookingDraft {
     checkIn: "2026-10-20",
     checkOut: "2026-10-23",
     guests: 2,
-    roomName: "",
-    guestName: "María Ñañez",
-    note: "Llegamos por la tarde",
-    accepted: true,
-    maxGuests: 10,
+    roomId: "aura",
+    roomName: "AURA (Matrimonial)",
+    guestName: "Paolo Leon",
+    dni: "12345678",
+    phone: "987654321",
+    maxGuests: 2,
+    occupied: [],
     ...overrides,
   };
 }
@@ -32,23 +34,27 @@ describe("fechas", () => {
   it("deshabilita las fechas anteriores a hoy y permite hoy", () => {
     expect(isPastDate("2026-10-11", today)).toBe(true);
     expect(isPastDate("2026-10-12", today)).toBe(false);
-    expect(activeAvailabilityProvider.statusFor("2026-10-11", today)).toBe("past");
-    expect(activeAvailabilityProvider.statusFor("2026-12-01", today)).toBe("selectable");
+    expect(statusForDate("2026-10-11", today, [])).toBe("past");
+    expect(statusForDate("2026-12-01", today, [])).toBe("selectable");
   });
 
   it("no afirma que una fecha futura esté disponible", () => {
-    const status = activeAvailabilityProvider.statusFor("2026-11-02", today, "habitacion");
+    const status = statusForDate("2026-11-02", today, []);
     expect(status).toBe("selectable");
     expect(status).not.toBe("available");
   });
 
-  it("marca como ocupadas solo las noches de ejemplo", () => {
-    expect(activeAvailabilityProvider.statusFor("2026-10-15", today)).toBe("occupied");
-    expect(activeAvailabilityProvider.statusFor("2026-10-17", today)).toBe("occupied");
-    expect(activeAvailabilityProvider.statusFor("2026-10-20", today)).toBe("selectable");
-    expect(validateBooking(draft({ checkIn: "2026-10-14", checkOut: "2026-10-16" }), today).map((issue) => issue.field)).toContain(
-      "checkOut",
-    );
+  it("ocupa las noches entre el ingreso y la salida, sin contar la salida", () => {
+    expect(nightsOfStay("2026-10-14", "2026-10-16")).toEqual(["2026-10-14", "2026-10-15"]);
+    expect(stayCrossesOccupied("2026-10-14", "2026-10-16", ["2026-10-15"])).toBe(true);
+    expect(stayCrossesOccupied("2026-10-14", "2026-10-16", ["2026-10-16"])).toBe(false);
+    expect(statusForDate("2026-10-15", today, ["2026-10-15"])).toBe("occupied");
+    expect(statusForDate("2026-10-20", today, ["2026-10-15"])).toBe("selectable");
+    expect(
+      validateBooking(draft({ checkIn: "2026-10-14", checkOut: "2026-10-16", occupied: ["2026-10-15"] }), today).map(
+        (issue) => issue.field,
+      ),
+    ).toContain("checkOut");
   });
 
   it("calcula las noches y cruza de mes", () => {
@@ -82,22 +88,21 @@ describe("fechas", () => {
 });
 
 describe("validación y WhatsApp", () => {
-  it("exige noches, huéspedes, una fecha libre y el nombre", () => {
+  it("exige habitación, noches libres, huéspedes, nombre, DNI y celular", () => {
     const issues = validateBooking(
       draft({
         checkIn: null,
         checkOut: null,
         guests: 0,
+        roomId: "",
         guestName: " ",
-        accepted: false,
+        dni: "",
+        phone: "",
       }),
       today,
     );
-    expect(issues.map((issue) => issue.field)).toEqual(["checkIn", "checkOut", "guests", "guestName"]);
-    expect(validateBooking(draft({ guestName: "", accepted: false }), today).map((issue) => issue.field)).toEqual([
-      "guestName",
-    ]);
-    expect(validateBooking(draft({ accepted: false }), today)).toEqual([]);
+    expect(issues.map((issue) => issue.field)).toEqual(["roomId", "checkIn", "checkOut", "guests", "guestName", "dni", "phone"]);
+    expect(validateBooking(draft({ guestName: "Ana", dni: "12345678", phone: "987654321" }), today)).toEqual([]);
   });
 
   it("impide que la salida sea el mismo día o una fecha pasada", () => {
@@ -114,30 +119,23 @@ describe("validación y WhatsApp", () => {
     expect(stayNights(draft())).toBe(3);
   });
 
-  it("arma el mensaje con los datos elegidos y no da la reserva por hecha", () => {
-    const message = buildReservationMessage(
-      draft({ roomName: "Habitación principal (ejemplo)", guests: 3, note: "¿Hay estacionamiento?" }),
-    );
+  it("arma un mensaje corto y formal, sin dar la reserva por hecha", () => {
+    const message = buildReservationMessage(draft({ roomName: "AURA (Matrimonial)", guests: 2 }));
 
-    expect(message).toContain("Hola, Casa Serena Otuzco. Quisiera consultar la disponibilidad para una reserva.");
-    expect(message).toContain("Nombre: María Ñañez");
-    expect(message).toContain("Habitación: Habitación principal (ejemplo)");
-    expect(message).toContain("Fecha de ingreso:");
+    expect(message.startsWith("Hola, soy Paolo Leon. Deseo consultar AURA (Matrimonial)")).toBe(true);
     expect(message).toContain("octubre");
-    expect(message).toContain("Fecha de salida:");
-    expect(message).toContain("Cantidad de huéspedes: 3");
-    expect(message).toContain("Cantidad de noches: 3");
-    expect(message).toContain("Consulta adicional: ¿Hay estacionamiento?");
-    expect(message).toContain("¿Podrían confirmarme la disponibilidad y el precio total, por favor?");
+    expect(message).toContain("para 2 personas (3 noches)");
+    expect(message).toContain("DNI: 12345678");
+    expect(message).toContain("Celular: 987654321");
+    expect(message).toContain("Quedo atento a su confirmación. Gracias.");
     expect(message.toLowerCase()).not.toContain("reserva confirmada");
     expect(message.toLowerCase()).not.toContain("está disponible");
   });
 
-  it("usa Sin preferencia y omite nombre y consulta si no hay datos", () => {
-    const message = buildReservationMessage(draft({ roomName: "  ", note: "  ", guestName: "  " }));
-    expect(message).toContain("Habitación: Sin preferencia");
-    expect(message).not.toContain("Consulta adicional");
-    expect(message).not.toContain("Nombre:");
+  it("deja el nombre en blanco si todavía no se escribió", () => {
+    const message = buildReservationMessage(draft({ roomName: "  ", guestName: "  " }));
+    expect(message).toContain("una habitación");
+    expect(message).toContain("Hola, soy ….");
   });
 
   it("codifica el enlace de WhatsApp y avisa si el número no está listo", () => {
@@ -146,8 +144,8 @@ describe("validación y WhatsApp", () => {
 
     expect(link?.startsWith("https://wa.me/51936020432?text=")).toBe(true);
     const decoded = decodeURIComponent(link!.split("?text=")[1]);
-    expect(decoded).toContain("María Ñañez");
-    expect(decoded).toContain("Cantidad de noches: 3");
+    expect(decoded).toContain("Paolo Leon");
+    expect(decoded).toContain("3 noches");
     expect(link).toContain("%0A");
 
     expect(buildWhatsappLink("", message)).toBeNull();
