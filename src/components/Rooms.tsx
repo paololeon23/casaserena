@@ -8,11 +8,11 @@ export function Rooms() {
   return (
     <section id="habitaciones" className="scroll-mt-24 bg-paper pb-2 pt-10 md:pt-24">
       <Container>
-        <p className="text-[11px] font-medium uppercase tracking-[0.22em]">La habitación</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.22em]">Dos habitaciones</p>
         <h2 className="mt-3 max-w-xl font-display text-4xl leading-[1.02] tracking-[-0.03em] sm:text-6xl">
-          Mira el lugar. <span className="italic">Elige la fecha.</span>
+          AURA y ALMA. <span className="italic">Elige una.</span>
         </h2>
-        <div className="mt-10 grid gap-8">
+        <div className="mt-10 grid gap-8 md:grid-cols-2">
           {rooms.map((room, index) => (
             <RoomCard key={room.id} room={room} mark={String(index + 1).padStart(2, "0")} />
           ))}

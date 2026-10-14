@@ -2,24 +2,32 @@ import { Container, SectionHeading } from "./ui";
 
 const terms = [
   {
-    title: "Qué se garantiza",
-    text: "Cuando Casa Serena confirma la reserva por WhatsApp, la habitación se entrega limpia y conforme a la foto y los videos de esta página. Si al llegar no corresponde a lo confirmado, puedes decirlo por WhatsApp antes de aceptar la estadía.",
+    title: "La reserva no queda hecha aquí",
+    text: "Elegir fechas y abrir WhatsApp es una consulta. La habitación queda reservada solo cuando Casa Serena responde y acepta. Esta página no cobra ni emite un comprobante.",
   },
   {
-    title: "Qué no queda garantizado aquí",
-    text: "Esta página no garantiza que las fechas estén libres, ni el precio, ni un reembolso. Nada de eso queda cerrado hasta que el encargado lo responda por WhatsApp. Enviar el formulario no es un contrato ni un pago.",
+    title: "Qué se ve en el calendario",
+    text: "Una noche tachada está reservada. El nombre de la persona no se publica. Del 14 al 16 se ocupan las noches del 14 y del 15; el 16 es el día de salida y puede ser el ingreso de otro huésped. Si la hoja no carga, no tomes el calendario como lista de días libres.",
   },
   {
-    title: "Fechas ocupadas de ejemplo",
-    text: "Las noches tachadas en el calendario son una simulación. Sirven para mostrar cómo se ve una fecha ocupada. No representan reservas reales y pueden cambiar cuando exista un calendario conectado.",
+    title: "Cuántas personas caben",
+    text: "Se indican de 2 a 4 personas. AURA es una cama matrimonial y ALMA son dos camas. Si el grupo no cabe en lo que se ve en las fotos, Casa Serena lo confirma por WhatsApp. Si llegan más de 4, se puede rechazar el ingreso.",
   },
   {
-    title: "Huéspedes y cuidado",
-    text: "Debes indicar cuántas personas se quedan. La habitación doble es para 2. Si vienen más, hace falta la confirmación de Casa Serena. El huésped responde por los daños que cause durante la estadía. Eso se conversa directamente con el encargado.",
+    title: "Cómo se entrega y qué se cuida",
+    text: "La habitación se entrega limpia y como se ve en las fotos de esta página. Si al llegar no corresponde, dilo antes de aceptar la estadía. El huésped responde por daños, faltantes y suciedad extraordinaria.",
   },
   {
-    title: "Pagos y datos",
-    text: "Esta web no cobra ni guarda una cuenta. El nombre, las fechas y la nota solo se escriben en el mensaje de WhatsApp cuando tú lo abres. El horario de ingreso, la salida y la cancelación se acuerdan en esa conversación.",
+    title: "Precio, horario y cancelación",
+    text: "El precio, la hora de ingreso, la hora de salida y la cancelación se acuerdan por WhatsApp antes de la llegada. Esta página no publica un precio ni una penalidad que no haya sido confirmada.",
+  },
+  {
+    title: "Nombre, DNI y celular",
+    text: "Se piden para identificar la consulta, llevar el registro del alojamiento y, más adelante, enviarte avisos de Casa Serena. No aparecen en el calendario. Al abrir WhatsApp aceptas ese uso.",
+  },
+  {
+    title: "El punto del mapa",
+    text: "El mapa marca el punto exacto que Casa Serena publicó. La forma de llegar se coordina por WhatsApp si hace falta un detalle más.",
   },
 ];
 
@@ -29,15 +37,15 @@ export function Policies() {
       <Container>
         <SectionHeading
           eyebrow="Antes de reservar"
-          title="Términos y garantía"
-          text="Léelo en un minuto. La reserva solo existe cuando Casa Serena la confirma."
+          title="Reglas"
+          text="Léelas antes de escribir. Sirven para que la estadía quede clara y no haya un reclamo después."
         />
-        <div className="mt-12 grid gap-px overflow-hidden rounded-[1.4rem] border border-line bg-line">
+        <div className="mt-8 grid gap-px overflow-hidden rounded-[1.4rem] border border-line bg-line md:grid-cols-2">
           {terms.map((item, index) => (
             <article key={item.title} className="bg-white p-6 sm:p-8">
               <p className="text-[11px] font-medium uppercase tracking-[0.16em]">{String(index + 1).padStart(2, "0")}</p>
               <h3 className="mt-2 font-display text-3xl tracking-[-0.03em]">{item.title}</h3>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed">{item.text}</p>
+              <p className="mt-3 text-sm leading-relaxed">{item.text}</p>
             </article>
           ))}
         </div>

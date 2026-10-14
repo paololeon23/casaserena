@@ -1,18 +1,20 @@
-import { activeAvailabilityProvider, stayCrossesOccupied } from "./availability";
+import { stayCrossesOccupied } from "./availability";
 import { formatLong, nightsBetween } from "./dates";
 
 export type BookingDraft = {
   checkIn: string | null;
   checkOut: string | null;
   guests: number;
+  roomId: string;
   roomName: string;
   guestName: string;
-  note: string;
-  accepted: boolean;
+  dni: string;
+  phone: string;
   maxGuests: number;
+  occupied: string[];
 };
 
-export type BookingField = "checkIn" | "checkOut" | "guests" | "guestName" | "note" | "accepted";
+export type BookingField = "checkIn" | "checkOut" | "guests" | "roomId" | "guestName" | "dni" | "phone";
 
 export type BookingIssue = {
   field: BookingField;
@@ -22,39 +24,55 @@ export type BookingIssue = {
 export function validateBooking(draft: BookingDraft, today: string): BookingIssue[] {
   const issues: BookingIssue[] = [];
 
+  if (!draft.roomId) {
+    issues.push({ field: "roomId", message: "Elige AURA o ALMA." });
+  }
+
   if (!draft.checkIn) {
     issues.push({ field: "checkIn", message: "Elige la fecha de ingreso." });
-  } else if (activeAvailabilityProvider.statusFor(draft.checkIn, today) === "past") {
+  } else if (draft.checkIn < today) {
     issues.push({ field: "checkIn", message: "La fecha de ingreso no puede ser anterior a hoy." });
+  } else if (draft.occupied.includes(draft.checkIn)) {
+    issues.push({ field: "checkIn", message: "Esa noche está reservada. Elige otra." });
   }
 
   if (!draft.checkOut) {
     issues.push({ field: "checkOut", message: "Elige la fecha de salida." });
   } else if (draft.checkIn && draft.checkOut <= draft.checkIn) {
     issues.push({ field: "checkOut", message: "La salida debe ser posterior al ingreso." });
-  } else if (draft.checkIn && stayCrossesOccupied(draft.checkIn, draft.checkOut, today)) {
+  } else if (draft.checkIn && stayCrossesOccupied(draft.checkIn, draft.checkOut, draft.occupied)) {
     issues.push({
       field: "checkOut",
-      message: "Esas noches incluyen una fecha ocupada. Elige otras noches.",
+      message: "Esas noches incluyen una fecha reservada. Elige otras noches.",
     });
-  } else if (activeAvailabilityProvider.statusFor(draft.checkOut, today) === "past") {
+  } else if (draft.checkOut < today) {
     issues.push({ field: "checkOut", message: "La fecha de salida no puede estar en el pasado." });
   }
 
-  if (!Number.isInteger(draft.guests) || draft.guests < 1) {
-    issues.push({ field: "guests", message: "Indica al menos 1 huésped." });
+  if (!Number.isInteger(draft.guests) || draft.guests < 2) {
+    issues.push({ field: "guests", message: "El mínimo es 2 personas." });
   } else if (draft.guests > draft.maxGuests) {
     issues.push({
       field: "guests",
-      message: `El formulario admite hasta ${draft.maxGuests} huéspedes. Confirma el grupo por WhatsApp.`,
+      message: `El máximo es ${draft.maxGuests} personas.`,
     });
   }
 
   const name = draft.guestName.trim();
   if (name.length < 2) {
-    issues.push({ field: "guestName", message: "Escribe tu nombre para la solicitud." });
+    issues.push({ field: "guestName", message: "Escribe tu nombre." });
   } else if (name.length > 80) {
     issues.push({ field: "guestName", message: "El nombre admite hasta 80 caracteres." });
+  }
+
+  const dni = draft.dni.replace(/\D/g, "");
+  if (dni.length !== 8) {
+    issues.push({ field: "dni", message: "Escribe tu DNI de 8 dígitos." });
+  }
+
+  const phone = draft.phone.replace(/\D/g, "");
+  if (!/^9\d{8}$/.test(phone)) {
+    issues.push({ field: "phone", message: "Escribe tu celular de 9 dígitos." });
   }
 
   return issues;
@@ -71,22 +89,21 @@ export function stayNights(draft: Pick<BookingDraft, "checkIn" | "checkOut">): n
 
 export function buildReservationMessage(draft: BookingDraft): string {
   const nights = stayNights(draft);
-  const room = draft.roomName.trim() || "Sin preferencia";
-  const lines = [
-    "Hola, Casa Serena Otuzco. Quisiera consultar la disponibilidad para una reserva.",
+  const room = draft.roomName.trim() || "una habitación";
+  const people = countLabel(Math.max(draft.guests, 0), "persona", "personas");
+  const stay =
+    draft.checkIn && draft.checkOut
+      ? `del ${formatLong(draft.checkIn)} al ${formatLong(draft.checkOut)}`
+      : "en las fechas que conversemos";
+  const nightText = nights ? ` (${countLabel(nights, "noche", "noches")})` : "";
+  return [
+    `Hola, soy ${draft.guestName.trim() || "…"}. Deseo consultar ${room}, ${stay}, para ${people}${nightText}.`,
     "",
-    `Habitación: ${room}`,
-    `Fecha de ingreso: ${draft.checkIn ? formatLong(draft.checkIn) : ""}`,
-    `Fecha de salida: ${draft.checkOut ? formatLong(draft.checkOut) : ""}`,
-    `Cantidad de huéspedes: ${draft.guests}`,
-    `Cantidad de noches: ${nights ?? ""}`,
-  ];
-  const name = draft.guestName.trim();
-  if (name) lines.push(`Nombre: ${name}`);
-  const note = draft.note.trim();
-  if (note) lines.push(`Consulta adicional: ${note}`);
-  lines.push("", "¿Podrían confirmarme la disponibilidad y el precio total, por favor?");
-  return lines.join("\n");
+    `DNI: ${draft.dni.replace(/\D/g, "")}`,
+    `Celular: ${draft.phone.replace(/\D/g, "")}`,
+    "",
+    "Quedo atento a su confirmación. Gracias.",
+  ].join("\n");
 }
 
 export function whatsappDigits(phone: string): string {
