@@ -14,13 +14,13 @@ export function RoomCard({ room, mark }: { room: Room; mark: string }) {
 
   return (
     <article className="overflow-hidden rounded-[1.4rem] border border-line bg-white">
-      <div className="grid grid-cols-2 gap-0.5 bg-[#E7EEE3]">
+      <div className="grid grid-cols-2 gap-0.5 bg-[#E7EEE3] xl:grid-cols-4">
         {total > 0 ? (
           room.images.map((image, imageIndex) => (
             <button
               key={image.src}
               type="button"
-              className="relative aspect-[3/4] overflow-hidden"
+              className="relative aspect-[3/4] overflow-hidden xl:aspect-[4/5]"
               aria-label={`Abrir foto ${imageIndex + 1} de ${room.name}`}
               onClick={() => {
                 setIndex(imageIndex);
@@ -31,16 +31,19 @@ export function RoomCard({ room, mark }: { room: Room; mark: string }) {
             </button>
           ))
         ) : (
-          <div className="col-span-2 aspect-[4/3]">
+          <div className="col-span-2 aspect-[4/3] xl:col-span-4 xl:aspect-[4/5]">
             <Photo alt={`Fotografía pendiente de ${room.name}`} mark={mark} />
           </div>
         )}
       </div>
-      <div className="p-5 sm:p-6">
+      <div className="p-5 sm:p-6 xl:grid xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] xl:items-end xl:gap-8">
+        <div>
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-ink/70">{room.kind}</p>
         <h3 className="mt-1 font-display text-[1.7rem] leading-none tracking-[-0.03em]">{room.name}</h3>
         <p className="mt-3 text-sm leading-relaxed text-ink/70">{room.summary}</p>
-        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm">
+        </div>
+        <div>
+        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm xl:mt-0 xl:border-t-0 xl:pt-0">
           <div>
             <dt className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink/70">Capacidad</dt>
             <dd className="mt-1">{room.capacity == null ? "Por completar" : `Hasta ${room.capacity}`}</dd>
@@ -64,7 +67,8 @@ export function RoomCard({ room, mark }: { room: Room; mark: string }) {
             <p className="mt-1 text-sm text-ink/70">Por completar</p>
           )}
         </div>
-        <div className="mt-6 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-end sm:justify-between">
+        </div>
+        <div className="mt-6 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-end sm:justify-between xl:mt-0 xl:flex-col xl:items-stretch xl:border-t-0 xl:pt-0">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-[0.16em]">La noche</p>
             {room.pricePerNight == null ? (

@@ -63,29 +63,44 @@ export function normalizeOccupied(data: OccupiedPayload): OccupiedPayload {
   };
 }
 
+/** Fecha de estadía como la escribe el encargado: 14-10-2026. */
+export function fechaParaHoja(iso: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return match ? `${match[3]}-${match[2]}-${match[1]}` : iso;
+}
+
 /** Envía la ficha a la hoja sin esperar la respuesta, para no bloquear WhatsApp. */
 export function sendRegistro(url: string, payload: RegistroPayload) {
   if (!url.trim()) return;
-  const frameId = "casa-serena-registro";
-  let frame = document.getElementById(frameId) as HTMLIFrameElement | null;
-  if (!frame) {
-    frame = document.createElement("iframe");
-    frame.id = frameId;
-    frame.name = frameId;
-    frame.hidden = true;
-    document.body.appendChild(frame);
-  }
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = url;
-  form.target = frameId;
-  form.acceptCharset = "UTF-8";
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.name = "payload";
-  input.value = JSON.stringify(payload);
-  form.append(input);
-  document.body.append(form);
-  form.submit();
-  form.remove();
+  const body = new URLSearchParams();
+  body.set("payload", JSON.stringify(payload));
+  void fetch(url, {
+    method: "POST",
+    mode: "no-cors",
+    keepalive: true,
+    body,
+  }).catch(() => {
+    const frameId = "casa-serena-registro";
+    let frame = document.getElementById(frameId) as HTMLIFrameElement | null;
+    if (!frame) {
+      frame = document.createElement("iframe");
+      frame.id = frameId;
+      frame.name = frameId;
+      frame.hidden = true;
+      document.body.append(frame);
+    }
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = url;
+    form.target = frameId;
+    form.hidden = true;
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "payload";
+    input.value = body.get("payload") ?? "";
+    form.append(input);
+    document.body.append(form);
+    form.submit();
+    window.setTimeout(() => form.remove(), 4000);
+  });
 }

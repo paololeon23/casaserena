@@ -3,7 +3,7 @@ import { appsScriptUrl, defaultGuests, formMaxGuests, formMinGuests, fullWhatsap
 import { stayCrossesOccupied } from "../lib/availability";
 import { buildReservationMessage, buildWhatsappLink, isWhatsappReady, stayNights, validateBooking, type BookingIssue } from "../lib/booking";
 import { addDays, applyDateSelection, todayISO } from "../lib/dates";
-import { fetchOccupied, sendRegistro, type OccupiedByRoom } from "../lib/sheet";
+import { fechaParaHoja, fetchOccupied, sendRegistro, type OccupiedByRoom } from "../lib/sheet";
 import { scrollToId } from "../lib/ui";
 
 type CalendarState = "cargando" | "listo" | "sin-enlace" | "error";
@@ -197,8 +197,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
             dni: draft.dni,
             celular: draft.phone,
             habitacion: draft.roomName,
-            fecha: draft.checkIn ?? "",
-            fechaFin: draft.checkOut ?? "",
+            fecha: draft.checkIn ? fechaParaHoja(draft.checkIn) : "",
+            fechaFin: draft.checkOut ? fechaParaHoja(draft.checkOut) : "",
             huespedes: String(draft.guests),
             noches: nights == null ? "" : String(nights),
           });

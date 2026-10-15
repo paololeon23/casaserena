@@ -12,7 +12,7 @@ export function Rooms() {
         <h2 className="mt-3 max-w-xl font-display text-4xl leading-[1.02] tracking-[-0.03em] sm:text-6xl">
           AURA y ALMA. <span className="italic">Elige una.</span>
         </h2>
-        <div className="mt-10 grid gap-8 md:grid-cols-2">
+        <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-1 xl:gap-6">
           {rooms.map((room, index) => (
             <RoomCard key={room.id} room={room} mark={String(index + 1).padStart(2, "0")} />
           ))}
