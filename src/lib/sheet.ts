@@ -23,29 +23,29 @@ export function fetchOccupied(url: string): Promise<OccupiedPayload> {
   const callback = `casaSerenaCalendario_${Date.now()}`;
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    const timer = window.setTimeout(() => {
-      cleanup();
-      reject(new Error("tiempo"));
-    }, 8000);
     const host = window as unknown as JsonpWindow;
+    let settled = false;
+    const timer = window.setTimeout(() => finish(() => reject(new Error("tiempo"))), 20000);
+
     host[callback] = (data) => {
-      cleanup();
-      if (!data || data.ok === false) {
-        reject(new Error("hoja"));
-        return;
-      }
-      resolve(normalizeOccupied(data));
+      finish(() => {
+        if (!data || data.ok === false) reject(new Error("hoja"));
+        else resolve(normalizeOccupied(data));
+      });
     };
-    function cleanup() {
+
+    function finish(done: () => void) {
+      if (settled) return;
+      settled = true;
       window.clearTimeout(timer);
-      script.remove();
-      delete host[callback];
+      window.setTimeout(() => {
+        script.remove();
+        delete host[callback];
+      }, 1500);
+      done();
     }
+
     script.src = `${url}${url.includes("?") ? "&" : "?"}action=ocupadas&callback=${callback}`;
-    script.onerror = () => {
-      cleanup();
-      reject(new Error("red"));
-    };
     document.head.appendChild(script);
   });
 }
