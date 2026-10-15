@@ -27,7 +27,7 @@ export function Booking() {
           title="Elige el ingreso y la salida"
           text="Primero la habitación y las noches libres. Después tu nombre, DNI y celular. Con eso se abre WhatsApp."
         />
-        <div id="habitaciones-reserva" className="mt-8 grid gap-3 sm:grid-cols-2">
+        <div id="habitaciones-reserva" className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_minmax(280px,0.8fr)] xl:items-stretch">
           {rooms.map((room) => {
             const active = booking.roomId === room.id;
             return (
@@ -46,35 +46,35 @@ export function Booking() {
               </button>
             );
           })}
-        </div>
-        <FieldError id="error-habitacion" message={issue("roomId")} />
-        <div className="mt-4">
-          <div className="rounded-[1.4rem] border border-line bg-white p-5 sm:max-w-md">
-            <p id="huespedes-reserva" className="text-[11px] font-medium uppercase tracking-[0.16em]">
-              ¿Cuántos huéspedes?
-            </p>
-            <div className="mt-4 flex items-center justify-between gap-3" role="group" aria-labelledby="huespedes-reserva">
-              <button
-                type="button"
-                className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
-                aria-label="Menos huéspedes"
-                onClick={() => booking.setGuests(booking.guests - 1)}
-              >
-                <Minus aria-hidden="true" />
-              </button>
-              <p className="font-display text-4xl tracking-[-0.03em]">{countLabel(booking.guests, "huésped", "huéspedes")}</p>
-              <button
-                type="button"
-                className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
-                aria-label="Más huéspedes"
-                onClick={() => booking.setGuests(booking.guests + 1)}
-              >
-                <Plus aria-hidden="true" />
-              </button>
+          <div className="sm:col-span-2 xl:col-span-1">
+            <div className="h-full rounded-[1.4rem] border border-line bg-white p-5">
+              <p id="huespedes-reserva" className="text-[11px] font-medium uppercase tracking-[0.16em]">
+                ¿Cuántos huéspedes?
+              </p>
+              <div className="mt-4 flex items-center justify-between gap-3" role="group" aria-labelledby="huespedes-reserva">
+                <button
+                  type="button"
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
+                  aria-label="Menos huéspedes"
+                  onClick={() => booking.setGuests(booking.guests - 1)}
+                >
+                  <Minus aria-hidden="true" />
+                </button>
+                <p className="font-display text-4xl tracking-[-0.03em]">{countLabel(booking.guests, "huésped", "huéspedes")}</p>
+                <button
+                  type="button"
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
+                  aria-label="Más huéspedes"
+                  onClick={() => booking.setGuests(booking.guests + 1)}
+                >
+                  <Plus aria-hidden="true" />
+                </button>
+              </div>
+              <p className="mt-3 text-sm">Mínimo 2 personas. Máximo 4.</p>
             </div>
-            <p className="mt-3 text-sm">Mínimo 2 personas. Máximo 4.</p>
           </div>
         </div>
+        <FieldError id="error-habitacion" message={issue("roomId")} />
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
           <Calendar checkIn={booking.checkIn} checkOut={booking.checkOut} onSelect={booking.selectDate} />
           <form

@@ -5,8 +5,10 @@
  *
  * 1. Ejecuta prepararHojas y acepta los permisos.
  *    En el registro verás la URL del Excel. Ahí quedan dos hojas:
- *    - Calendario: lo que tapa noches en la página. El nombre no sale a la web.
- *    - Registros: cada consulta (nombre, DNI, celular, hora y fechas).
+ *    - Calendario: noches que tapas a mano. El nombre no sale a la web.
+ *    - Registros: cada persona que pulsa Reservar por WhatsApp.
+ *      Nombre, DNI, celular, fecha y hora se guardan ahí.
+ *      Esas fechas también tapan el calendario. El nombre no se publica.
  * 2. Implementar > Nueva implementación > Aplicación web.
  *    Ejecutar como: Yo
  *    Quién tiene acceso: Cualquier persona
@@ -109,31 +111,46 @@ function ocupadasPublicas() {
       habitaciones: { aura: [], alma: [] },
     };
   }
-  var sheet = libro.getSheetByName(HOJA_CALENDARIO);
   var habitaciones = { aura: [], alma: [] };
-  if (!sheet || sheet.getLastRow() < 2) {
-    return { ok: true, actualizado: ahora(), habitaciones: habitaciones };
-  }
-  var filas = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getDisplayValues();
-  filas.forEach(function (fila) {
-    if (!bloquea(fila[4])) return;
-    var inicio = parseFecha(fila[0]);
-    var fin = parseFecha(fila[1]);
-    var roomId = habitacionId(fila[3]);
-    if (!inicio || !fin || !roomId || fin <= inicio) return;
-    nightsOfStay(inicio, fin).forEach(function (iso) {
-      if (habitaciones[roomId].indexOf(iso) === -1) habitaciones[roomId].push(iso);
-    });
-  });
+  leerCalendario(libro, habitaciones);
+  leerRegistros(libro, habitaciones);
   habitaciones.aura.sort();
   habitaciones.alma.sort();
   return { ok: true, actualizado: ahora(), habitaciones: habitaciones };
+}
+
+function leerCalendario(libro, habitaciones) {
+  var sheet = libro.getSheetByName(HOJA_CALENDARIO);
+  if (!sheet || sheet.getLastRow() < 2) return;
+  sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getDisplayValues().forEach(function (fila) {
+    if (!bloquea(fila[4])) return;
+    ocuparRango(habitaciones, parseFecha(fila[0]), parseFecha(fila[1]), habitacionId(fila[3]));
+  });
+}
+
+function leerRegistros(libro, habitaciones) {
+  var sheet = libro.getSheetByName(HOJA_REGISTROS);
+  if (!sheet || sheet.getLastRow() < 2) return;
+  sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getDisplayValues().forEach(function (fila) {
+    ocuparRango(habitaciones, parseFecha(fila[6]), parseFecha(fila[7]), habitacionId(fila[5]));
+  });
+}
+
+function ocuparRango(habitaciones, inicio, fin, roomId) {
+  if (!inicio || !fin || !roomId || fin <= inicio || !habitaciones[roomId]) return;
+  nightsOfStay(inicio, fin).forEach(function (iso) {
+    if (habitaciones[roomId].indexOf(iso) === -1) habitaciones[roomId].push(iso);
+  });
 }
 
 function guardarRegistro(data) {
   var libro = abrirLibro();
   if (!libro) {
     return { ok: false, error: "Ejecuta prepararHojas antes de recibir consultas." };
+  }
+  var ficha = fichaValida(data);
+  if (!ficha) {
+    return { ok: false, error: "Faltan nombre, DNI, celular o las fechas de la estadía." };
   }
   var lock = LockService.getScriptLock();
   lock.waitLock(15000);
@@ -145,19 +162,40 @@ function guardarRegistro(data) {
     sheet.getRange(row, 1, 1, ENCABEZADO_REGISTROS.length).setValues([[
       Utilities.formatDate(momento, ZONA, "dd-MM-yyyy"),
       Utilities.formatDate(momento, ZONA, "HH:mm:ss"),
-      texto(data.nombre, 80),
-      texto(data.dni, 12),
-      texto(data.celular, 15),
-      texto(data.habitacion, 40),
-      texto(data.fecha, 20),
-      texto(data.fechaFin, 20),
-      texto(data.huespedes, 4),
-      texto(data.noches, 4),
+      ficha.nombre,
+      ficha.dni,
+      ficha.celular,
+      ficha.habitacion,
+      ficha.fecha,
+      ficha.fechaFin,
+      ficha.huespedes,
+      ficha.noches,
     ]]);
     return { ok: true, actualizado: ahora() };
   } finally {
     lock.releaseLock();
   }
+}
+
+function fichaValida(data) {
+  var nombre = texto(data.nombre, 80);
+  var dni = texto(data.dni, 12).replace(/\D/g, "");
+  var celular = texto(data.celular, 15).replace(/\D/g, "");
+  var inicio = parseFecha(data.fecha);
+  var fin = parseFecha(data.fechaFin);
+  var roomId = habitacionId(data.habitacion);
+  if (nombre.length < 2 || !/^\d{8}$/.test(dni) || !/^9\d{8}$/.test(celular)) return null;
+  if (!inicio || !fin || fin <= inicio || !roomId) return null;
+  return {
+    nombre: nombre,
+    dni: dni,
+    celular: celular,
+    habitacion: texto(data.habitacion, 40),
+    fecha: texto(data.fecha, 20),
+    fechaFin: texto(data.fechaFin, 20),
+    huespedes: texto(data.huespedes, 4),
+    noches: texto(data.noches, 4),
+  };
 }
 
 function abrirLibro() {

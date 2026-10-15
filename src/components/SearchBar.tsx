@@ -12,13 +12,13 @@ export function SearchBar() {
 
   return (
     <form
-      className="rounded-[1.6rem] border border-white/70 bg-white p-2 text-ink shadow-[0_24px_60px_-32px_rgba(84,108,76,0.45)]"
+      className="rounded-[1.6rem] border border-white/70 bg-white p-2 text-ink shadow-[0_24px_60px_-32px_rgba(84,108,76,0.45)] lg:flex lg:items-stretch lg:gap-1"
       onSubmit={(event) => {
         event.preventDefault();
         scrollToId("reservar");
       }}
     >
-      <div className="grid grid-cols-2 gap-1 md:grid-cols-3">
+      <div className="grid min-w-0 flex-1 grid-cols-2 gap-1 md:grid-cols-3">
         <button type="button" className="rounded-2xl px-4 py-3 text-left hover:bg-paper" onClick={() => scrollToId("reservar")}>
           <span className="block text-[10px] font-medium uppercase tracking-[0.16em]">Ingreso</span>
           <span className="mt-1 block text-sm font-medium">{checkInLabel}</span>
@@ -53,7 +53,7 @@ export function SearchBar() {
           <p className="sr-only">Mínimo 2 personas. Máximo {formMaxGuests}.</p>
         </div>
       </div>
-      <button type="submit" className="mt-1 w-full rounded-2xl bg-ink px-4 py-3.5 text-sm font-medium text-white">
+      <button type="submit" className="mt-1 w-full rounded-2xl bg-ink px-6 py-3.5 text-sm font-medium text-white lg:mt-0 lg:w-auto lg:shrink-0">
         Ver el calendario
       </button>
     </form>
