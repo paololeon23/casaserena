@@ -56,12 +56,20 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   const initialCalendar: CalendarState = appsScriptUrl ? "cargando" : "sin-enlace";
   const [calendarState, setCalendarState] = useState<"cargando" | "listo" | "sin-enlace" | "error">(initialCalendar);
   const today = todayISO();
-  const occupiedNights = occupied[roomId] ?? [];
+  const occupiedNights = useMemo(() => {
+    const nights = roomId
+      ? (occupied[roomId] ?? [])
+      : [...(occupied.aura ?? []), ...(occupied.alma ?? [])];
+    return [...new Set(nights)].sort();
+  }, [occupied, roomId]);
 
   useEffect(() => {
     if (!appsScriptUrl) return;
     let stop = false;
+    let pending = false;
     async function load() {
+      if (stop || pending || document.visibilityState === "hidden") return;
+      pending = true;
       try {
         const data = await fetchOccupied(appsScriptUrl);
         if (stop) return;
@@ -69,19 +77,32 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         setCalendarState("listo");
       } catch {
         if (!stop) setCalendarState("error");
+      } finally {
+        pending = false;
       }
     }
     void load();
-    const timer = window.setInterval(() => void load(), 45000);
+    const timer = window.setInterval(() => void load(), 10000);
+    function onVisible() {
+      if (document.visibilityState === "visible") void load();
+    }
     window.addEventListener("focus", load);
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       stop = true;
       window.clearInterval(timer);
       window.removeEventListener("focus", load);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
   useEffect(() => {
+    if (checkIn && occupiedNights.includes(checkIn)) {
+      setCheckIn(null);
+      setCheckOut(null);
+      setDateNotice("Esa noche está reservada. Elige otra.");
+      return;
+    }
     if (checkIn && checkOut && stayCrossesOccupied(checkIn, checkOut, occupiedNights)) {
       setCheckOut(null);
       setDateNotice("Esas noches ya están reservadas. Elige otra salida.");

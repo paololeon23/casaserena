@@ -104,7 +104,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
                     "mx-auto flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium",
                     past && "cursor-not-allowed text-ink/30",
                     occupied && "cursor-not-allowed bg-[#E7EEE3] text-ink/45 line-through",
-                    (start || end) && "bg-ink text-white",
+                    (start || end) && !occupied && "bg-ink text-white",
                     !blocked && !start && !end && "hover:bg-paper",
                     isToday && !start && !end && !occupied && "ring-1 ring-ink",
                   )}
@@ -187,9 +187,13 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
           ? "No pude leer la hoja. No tomes estas fechas como libres. Confírmalas por WhatsApp."
           : booking.calendarState === "sin-enlace"
             ? "Las noches reservadas aparecen aquí cuando la hoja de Casa Serena está conectada. Hasta entonces, la confirmación es por WhatsApp."
-            : booking.roomId
-              ? "Una noche tachada está reservada. El nombre no se muestra. La salida no cuenta como noche ocupada."
-              : "Elige AURA o ALMA para ver qué noches están reservadas en esa habitación."}
+            : booking.occupiedNights.length > 0
+              ? booking.roomId
+                ? "Las noches tachadas están reservadas en la hoja. El nombre no se muestra. La salida no cuenta como noche ocupada."
+                : "Las noches tachadas están reservadas. Elige AURA o ALMA para ver solo las de esa habitación."
+              : booking.roomId
+                ? "La hoja de reservas no tiene noches ocupadas en esta habitación. Todas las fechas desde hoy se pueden elegir."
+                : "Elige AURA o ALMA. Si agregas una reserva en la hoja, la noche se tacha sola."}
       </p>
     </div>
   );
