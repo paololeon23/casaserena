@@ -12,22 +12,25 @@ export function Rooms() {
         <h2 className="mt-3 max-w-xl font-display text-4xl leading-[1.02] tracking-[-0.03em] sm:text-6xl">
           AURA y ALMA. <span className="italic">Elige una.</span>
         </h2>
-        <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-1 xl:gap-6">
+        <div className="mt-10 grid gap-8 xl:gap-6">
           {rooms.map((room, index) => (
             <RoomCard key={room.id} room={room} mark={String(index + 1).padStart(2, "0")} />
           ))}
         </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
           {stayVideos.map((video) => (
             <figure key={video.src} className="overflow-hidden rounded-[1.4rem] bg-[#1c2618]">
               <video
-                className="h-[420px] w-full bg-black object-cover sm:h-[520px]"
+                className="aspect-[9/16] max-h-[70vh] w-full bg-black object-cover sm:aspect-[3/4] sm:max-h-[520px]"
                 controls
                 playsInline
                 preload="metadata"
                 poster={video.poster}
               >
-                <source src={video.src} type="video/mp4" />
+                <source
+                  src={video.src}
+                  type={video.src.toLowerCase().endsWith(".mov") ? "video/quicktime" : "video/mp4"}
+                />
               </video>
               <figcaption className="px-4 py-3 text-sm text-white">
                 <span className="font-medium">{video.title}</span>

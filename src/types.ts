@@ -3,6 +3,13 @@ export type MediaImage = {
   alt: string;
 };
 
+export type AmenityIcon = "bed" | "bath" | "shower" | "tv" | "coffee" | "armchair" | "users" | "wifi" | "closet";
+
+export type RoomAmenity = {
+  label: string;
+  icon: AmenityIcon;
+};
+
 export type Room = {
   id: string;
   isExample: boolean;
@@ -11,7 +18,7 @@ export type Room = {
   summary: string;
   capacity: number | null;
   bedType: string;
-  amenities: string[];
+  amenities: RoomAmenity[];
   pricePerNight: number | null;
   images: MediaImage[];
 };

@@ -5,7 +5,6 @@ const checklist = [
   "Escribir la dirección real y el mapa.",
   "Agregar la portada y las fotos.",
   "Reemplazar las habitaciones de ejemplo.",
-  "Completar horarios de ingreso y salida.",
   "Redactar reserva y cancelación.",
 ];
 
@@ -14,7 +13,7 @@ export function Footer() {
     <footer className="bg-ink text-white">
       {showingExamples() ? (
         <div className="border-b border-white/10">
-          <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-white/80">Antes de publicar</p>
             <ul className="mt-5 grid gap-x-10 gap-y-2 text-sm text-white/90 sm:grid-cols-2">
               {checklist.map((item) => (
@@ -26,7 +25,7 @@ export function Footer() {
           </div>
         </div>
       ) : null}
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-12 sm:px-8 md:flex-row md:items-end md:justify-between">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 sm:px-6 lg:px-8 md:flex-row md:items-end md:justify-between">
         <div>
           <img src="/logo-mark.png" alt="" className="h-16 w-12 object-contain brightness-0 invert" width={447} height={602} />
           <p className="mt-4 font-display text-4xl uppercase tracking-[0.12em]">Casa Serena</p>

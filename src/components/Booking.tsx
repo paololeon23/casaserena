@@ -27,7 +27,7 @@ export function Booking() {
           title="Elige el ingreso y la salida"
           text="Primero la habitación y las noches libres. Después tu nombre, DNI y celular. Con eso se abre WhatsApp."
         />
-        <div id="habitaciones-reserva" className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_minmax(280px,0.8fr)] xl:items-stretch">
+        <div id="habitaciones-reserva" className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_minmax(260px,0.85fr)] xl:items-stretch">
           {rooms.map((room) => {
             const active = booking.roomId === room.id;
             return (
@@ -35,13 +35,15 @@ export function Booking() {
                 key={room.id}
                 type="button"
                 aria-pressed={active}
-                className={`rounded-[1.4rem] border px-5 py-4 text-left ${active ? "border-ink bg-ink text-white" : "border-line bg-white"}`}
+                className={`min-w-0 rounded-[1.4rem] border px-4 py-4 text-left sm:px-5 ${active ? "border-ink bg-ink text-white" : "border-line bg-white"}`}
                 onClick={() => booking.setRoomId(room.id)}
               >
-                <span className="text-[11px] font-medium uppercase tracking-[0.16em]">{room.kind}</span>
-                <span className="mt-1 block font-display text-3xl tracking-[-0.03em]">{room.name}</span>
-                <span className={`mt-1 block text-sm ${active ? "text-white/85" : "text-ink/70"}`}>
-                  {room.bedType}. {room.capacity} personas.
+                <span className="text-xs font-medium uppercase tracking-[0.16em] sm:text-sm">{room.kind}</span>
+                <span className="mt-1 block font-display text-[2.1rem] leading-none tracking-[-0.03em] sm:text-4xl lg:text-5xl">
+                  {room.name}
+                </span>
+                <span className={`mt-2 block text-sm leading-snug ${active ? "text-white/85" : "text-ink/70"}`}>
+                  {room.bedType}. Hasta {room.capacity} personas.
                 </span>
               </button>
             );
@@ -54,23 +56,25 @@ export function Booking() {
               <div className="mt-4 flex items-center justify-between gap-3" role="group" aria-labelledby="huespedes-reserva">
                 <button
                   type="button"
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line"
                   aria-label="Menos huéspedes"
                   onClick={() => booking.setGuests(booking.guests - 1)}
                 >
                   <Minus aria-hidden="true" />
                 </button>
-                <p className="font-display text-4xl tracking-[-0.03em]">{countLabel(booking.guests, "huésped", "huéspedes")}</p>
+                <p className="min-w-0 text-center font-display text-3xl tracking-[-0.03em] sm:text-4xl">
+                  {countLabel(booking.guests, "huésped", "huéspedes")}
+                </p>
                 <button
                   type="button"
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line"
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line"
                   aria-label="Más huéspedes"
                   onClick={() => booking.setGuests(booking.guests + 1)}
                 >
                   <Plus aria-hidden="true" />
                 </button>
               </div>
-              <p className="mt-3 text-sm">Mínimo 2 personas. Máximo 4.</p>
+              <p className="mt-3 text-sm">Mínimo 1 persona. Máximo 4.</p>
             </div>
           </div>
         </div>
@@ -78,7 +82,7 @@ export function Booking() {
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
           <Calendar checkIn={booking.checkIn} checkOut={booking.checkOut} onSelect={booking.selectDate} />
           <form
-            className="h-fit rounded-[1.75rem] border border-line bg-white p-5 shadow-soft lg:sticky lg:top-28"
+            className="h-fit rounded-[1.75rem] border border-line bg-white p-5 shadow-soft lg:sticky lg:top-24"
             onSubmit={(event) => event.preventDefault()}
           >
             <div>

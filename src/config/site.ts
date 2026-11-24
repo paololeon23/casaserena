@@ -57,16 +57,16 @@ export const appsScriptUrl =
   "https://script.google.com/macros/s/AKfycby0Byjy1GYKkWRqTsEwftYUmiEHRDnYoN9UaSxB4PZkUe9k5XW0WMjaev5AwuLhrDov/exec";
 
 export const stay = {
-  checkInTime: "",
-  checkOutTime: "",
+  checkInTime: "12:00 p. m.",
+  checkOutTime: "11:00 a. m.",
   reservationPolicy: "",
   cancellationPolicy: "",
 };
 
-/** El formulario admite de 2 a 4 personas. */
-export const formMinGuests = 2;
+/** El formulario admite de 1 a 4 personas. */
+export const formMinGuests = 1;
 export const formMaxGuests = 4;
-export const defaultGuests = 2;
+export const defaultGuests = 1;
 export const currency = "PEN";
 
 /**
@@ -76,8 +76,8 @@ export const currency = "PEN";
  */
 export const showExampleRooms = false;
 
-export const heroImage = "/media/aura/01.jpg";
-export const heroImageAlt = "Habitación matrimonial AURA de Casa Serena, con una cama amplia y luz de la ventana.";
+export const heroImage = "/media/entrada.jpeg";
+export const heroImageAlt = "Habitación de Casa Serena en Otuzco, con dos camas, sillón y mucha luz.";
 
 export const gallery: MediaImage[] = [
   {
@@ -88,16 +88,16 @@ export const gallery: MediaImage[] = [
 
 export const stayVideos = [
   {
-    src: "/media/otuzco.mp4",
-    poster: "/media/poster-otuzco.jpg",
-    title: "Otuzco y la habitación",
-    caption: "El pueblo y el lugar donde te quedas.",
+    src: "/media/aura.mp4",
+    poster: "/media/aura/01.jpg",
+    title: "AURA",
+    caption: "Habitación matrimonial. Hasta 2 personas.",
   },
   {
-    src: "/media/detalle.mp4",
-    poster: "/media/poster-detalle.jpg",
-    title: "El detalle",
-    caption: "Si buscabas dónde quedarte en Otuzco, encontraste.",
+    src: "/media/alma.mp4",
+    poster: "/media/alma/01.jpg",
+    title: "ALMA",
+    caption: "Habitación doble. Hasta 4 personas.",
   },
 ];
 
@@ -113,10 +113,17 @@ export const realRooms: Room[] = [
     isExample: false,
     name: "AURA",
     kind: "Matrimonial",
-    summary: "Una cama matrimonial, baño privado, TV y un rincón con cafetera. Para 2 personas.",
+    summary: "Habitación cómoda y privada para 2 personas, con cama de 2 plazas y baño privado.",
     capacity: 2,
-    bedType: "Una cama matrimonial",
-    amenities: ["Cama matrimonial", "Baño privado", "TV", "Cafetera"],
+    bedType: "1 cama de 2 plazas",
+    amenities: [
+      { label: "Habitación cómoda y privada (1 cama de 2 plazas)", icon: "bed" },
+      { label: "S-MART TV", icon: "tv" },
+      { label: "Armario", icon: "closet" },
+      { label: "Área de café y té + sandwichera", icon: "coffee" },
+      { label: "Internet / WiFi", icon: "wifi" },
+      { label: "Baño privado con agua caliente", icon: "shower" },
+    ],
     pricePerNight: null,
     images: [
       { src: "/media/aura/01.jpg", alt: "Habitación AURA con cama matrimonial, mesa y ventana." },
@@ -130,10 +137,17 @@ export const realRooms: Room[] = [
     isExample: false,
     name: "ALMA",
     kind: "Doble",
-    summary: "Dos camas, baño privado y un sillón. Para 2 personas.",
-    capacity: 2,
-    bedType: "Dos camas",
-    amenities: ["Dos camas", "Baño privado", "Sillón"],
+    summary: "Habitación cómoda y privada para hasta 4 personas, con 2 camas de 2 plazas y baño privado.",
+    capacity: 4,
+    bedType: "2 camas de 2 plazas",
+    amenities: [
+      { label: "Habitación cómoda y privada (2 camas de 2 plazas)", icon: "bed" },
+      { label: "Butaca cómoda", icon: "armchair" },
+      { label: "S-MART TV", icon: "tv" },
+      { label: "Armario", icon: "closet" },
+      { label: "Internet / WiFi", icon: "wifi" },
+      { label: "Baño privado con agua caliente", icon: "shower" },
+    ],
     pricePerNight: null,
     images: [
       { src: "/media/alma/01.jpg", alt: "Habitación ALMA con dos camas, cuadros y un sillón." },

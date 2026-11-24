@@ -11,7 +11,7 @@ const terms = [
   },
   {
     title: "Cuántas personas caben",
-    text: "Se indican de 2 a 4 personas. AURA es una cama matrimonial y ALMA son dos camas. Si el grupo no cabe en lo que se ve en las fotos, Casa Serena lo confirma por WhatsApp. Si llegan más de 4, se puede rechazar el ingreso.",
+    text: "Se indican de 1 a 4 personas. AURA es matrimonial hasta 2. ALMA es doble hasta 4. Si el grupo no cabe en lo que se ve en las fotos, Casa Serena lo confirma por WhatsApp. Si llegan más de 4, se puede rechazar el ingreso.",
   },
   {
     title: "Cómo se entrega y qué se cuida",
@@ -19,7 +19,7 @@ const terms = [
   },
   {
     title: "Precio, horario y cancelación",
-    text: "El precio, la hora de ingreso, la hora de salida y la cancelación se acuerdan por WhatsApp antes de la llegada. Esta página no publica un precio ni una penalidad que no haya sido confirmada.",
+    text: "Ingreso a las 12:00 p. m. y salida a las 11:00 a. m. El precio total y la cancelación se confirman por WhatsApp antes de la llegada. Esta página no publica un precio ni una penalidad que no haya sido confirmada.",
   },
   {
     title: "Nombre, DNI y celular",
@@ -28,6 +28,10 @@ const terms = [
   {
     title: "El punto del mapa",
     text: "El mapa marca el punto exacto que Casa Serena publicó. La forma de llegar se coordina por WhatsApp si hace falta un detalle más.",
+  },
+  {
+    title: "Cómo se paga la reserva",
+    text: "La reserva se confirma por WhatsApp. Se reserva con el 50% y el otro 50% se paga al hacer el check-in. El monto exacto lo confirma Casa Serena antes de tu llegada.",
   },
 ];
 

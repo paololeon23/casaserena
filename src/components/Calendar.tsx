@@ -32,7 +32,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
   const [months, setMonths] = useState(1);
 
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 768px)");
+    const media = window.matchMedia("(min-width: 1280px)");
     const update = () => setMonths(media.matches ? 2 : 1);
     update();
     media.addEventListener("change", update);
@@ -101,7 +101,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
                   aria-pressed={start || end}
                   aria-label={labelParts.join(", ")}
                   className={cn(
-                    "mx-auto flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium",
+                    "mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium sm:h-10 sm:w-10",
                     past && "cursor-not-allowed text-ink/30",
                     occupied && "cursor-not-allowed bg-[#E7EEE3] text-ink/45 line-through",
                     (start || end) && !occupied && "bg-ink text-white",
@@ -160,7 +160,7 @@ export function Calendar({ checkIn, checkOut, onSelect }: CalendarProps) {
           <ChevronRight aria-hidden="true" />
         </button>
       </div>
-      <div className={cn("grid gap-8", months === 2 && "md:grid-cols-2")}>
+      <div className={cn("grid gap-8", months === 2 && "xl:grid-cols-2")}>
         {visible.map((item) => renderMonth(item.year, item.month))}
       </div>
       <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs">

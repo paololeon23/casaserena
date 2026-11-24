@@ -7,24 +7,19 @@
  * 2. Extensiones > Apps Script. Pega este archivo y guarda.
  * 3. Ejecuta prepararHojas y acepta los permisos.
  *    En ese mismo Excel quedan dos pestañas:
- *    - Calendario: lo que tapa noches en la página. El nombre no sale a la web.
- *    - Registros: interesados. La misma fecha inicio y fecha fin puede repetirse
- *      entre personas distintas. No tapa el calendario.
+ *    - Calendario: reservas confirmadas. El nombre no sale a la web.
+ *    - Registros: interesados. No tapa el calendario.
  * 4. Implementar > Nueva implementación > Aplicación web.
- *    Ejecutar como: Yo
- *    Quién tiene acceso: Cualquier persona
- * 5. Copia la URL que termina en /exec y pégala en src/config/site.ts, en appsScriptUrl.
- *    Si cambias este código, haz una implementación nueva. La URL vieja no se actualiza.
+ *    Ejecutar como: Yo · Quién tiene acceso: Cualquier persona
+ * 5. Copia la URL /exec a src/config/site.ts (appsScriptUrl).
  *
- * Calendario, una fila por reserva confirmada:
- * Fecha inicio | Fecha fin | Nombre | Habitacion | Dni | Celular | Hora registro
- * Habitacion es una lista. Se elige AURA o ALMA, no se escribe.
- * 15-10-2026 | 16-10-2026 | Nombre del huésped | AURA (Matrimonial) | 12345678 | 987654321 | 14:30:00
- * Eso ocupa el 15. El 16 es la salida y queda libre.
+ * Calendario:
+ * Fecha inicio | Fecha fin | Nombre | Habitacion | Dni | Celular | Hora registro | Precio por noche | Costo final
  *
- * Prueba en el navegador, cambiando la URL:
- * https://script.google.com/macros/s/TU_ID/exec?action=ocupadas
- * Tiene que verse un JSON con "ok": true.
+ * Habitacion: lista AURA / ALMA.
+ * Precio por noche (H): lo escribes tú.
+ * Costo final (I): se calcula solo = precio × noches (salida no cuenta).
+ * Ejemplo: 15-10-2026 → 17-10-2026 = 2 noches. Si H = 65, I = 130.
  */
 
 var ZONA = "America/Lima";
@@ -32,9 +27,21 @@ var HOJA_CALENDARIO = "Calendario";
 var HOJA_REGISTROS = "Registros";
 var VERDE = "#546C4C";
 var BLANCO = "#FFFFFF";
+var FORMATO_MONEDA = '"S/"#,##0.00';
+var FILAS_FORMULA = 500;
 
 var LISTA_HABITACION = ["AURA", "ALMA"];
-var ENCABEZADO_CALENDARIO = ["Fecha inicio", "Fecha fin", "Nombre", "Habitacion", "Dni", "Celular", "Hora registro"];
+var ENCABEZADO_CALENDARIO = [
+  "Fecha inicio",
+  "Fecha fin",
+  "Nombre",
+  "Habitacion",
+  "Dni",
+  "Celular",
+  "Hora registro",
+  "Precio por noche",
+  "Costo final",
+];
 var ENCABEZADO_REGISTROS = [
   "Registrado",
   "Hora",
@@ -56,9 +63,9 @@ function prepararHojas() {
   libro.setSpreadsheetTimeZone(ZONA);
   var calendario = asegurarHoja(libro, HOJA_CALENDARIO, ENCABEZADO_CALENDARIO);
   var registros = asegurarHoja(libro, HOJA_REGISTROS, ENCABEZADO_REGISTROS);
-  calendario.getRange("A:B").setNumberFormat("dd-mm-yyyy");
-  calendario.getRange("E:F").setNumberFormat("@");
+  darFormatoCalendario(calendario);
   ponerListaHabitacion(calendario, 4);
+  ponerFormulasCosto(calendario);
   registros.getRange("D:E").setNumberFormat("@");
   registros.getRange("G:H").setNumberFormat("@");
   quitarHojaVacia(libro, "Hoja 1");
@@ -109,7 +116,7 @@ function ocupadasPublicas() {
   if (!sheet || sheet.getLastRow() < 2) {
     return { ok: true, actualizado: ahora(), habitaciones: habitaciones };
   }
-  var filas = sheet.getRange(2, 1, sheet.getLastRow() - 1, ENCABEZADO_CALENDARIO.length).getDisplayValues();
+  var filas = sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getDisplayValues();
   filas.forEach(function (fila) {
     var inicio = parseFecha(fila[0]);
     var fin = parseFecha(fila[1]);
@@ -181,13 +188,51 @@ function asegurarHoja(libro, nombre, encabezados) {
     .setFontColor(BLANCO)
     .setBackground(VERDE)
     .setHorizontalAlignment("center")
-    .setVerticalAlignment("middle");
-  sheet.setRowHeight(1, 36);
+    .setVerticalAlignment("middle")
+    .setWrap(true);
+  sheet.setRowHeight(1, 40);
   sheet.setFrozenRows(1);
   encabezados.forEach(function (titulo, indice) {
-    sheet.setColumnWidth(indice + 1, Math.max(120, titulo.length * 11 + 28));
+    sheet.setColumnWidth(indice + 1, Math.max(130, titulo.length * 10 + 36));
   });
   return sheet;
+}
+
+function darFormatoCalendario(sheet) {
+  sheet.getRange("A2:B" + FILAS_FORMULA).setNumberFormat("dd-mm-yyyy");
+  sheet.getRange("E2:F" + FILAS_FORMULA).setNumberFormat("@");
+  sheet.getRange("G2:G" + FILAS_FORMULA).setNumberFormat("@");
+  sheet.getRange("H2:I" + FILAS_FORMULA).setNumberFormat(FORMATO_MONEDA);
+  sheet.getRange("A2:I" + FILAS_FORMULA)
+    .setFontFamily("Arial")
+    .setFontSize(11)
+    .setVerticalAlignment("middle");
+  sheet.getRange("A2:B" + FILAS_FORMULA).setHorizontalAlignment("center");
+  sheet.getRange("D2:D" + FILAS_FORMULA).setHorizontalAlignment("center");
+  sheet.getRange("H2:I" + FILAS_FORMULA).setHorizontalAlignment("right");
+  sheet.setColumnWidth(1, 120);
+  sheet.setColumnWidth(2, 120);
+  sheet.setColumnWidth(3, 170);
+  sheet.setColumnWidth(4, 120);
+  sheet.setColumnWidth(5, 110);
+  sheet.setColumnWidth(6, 120);
+  sheet.setColumnWidth(7, 130);
+  sheet.setColumnWidth(8, 140);
+  sheet.setColumnWidth(9, 130);
+}
+
+/**
+ * Columna I: Costo final = Precio por noche × noches.
+ * Noches = Fecha fin − Fecha inicio (la salida no se cobra).
+ * Se recalcula sola cuando escribes el precio en H.
+ */
+function ponerFormulasCosto(sheet) {
+  // Precio × noches. Noches = Fecha fin − Fecha inicio (la salida no se cobra).
+  sheet.getRange("I2").setFormula(
+    '=ARRAYFORMULA(IF(H2:H' + FILAS_FORMULA + '="","",IF(A2:A' + FILAS_FORMULA + '="","",H2:H' + FILAS_FORMULA + '*IF(B2:B' + FILAS_FORMULA + '-A2:A' + FILAS_FORMULA + '>0,B2:B' + FILAS_FORMULA + '-A2:A' + FILAS_FORMULA + ',0))))'
+  );
+  sheet.getRange("I1").setNote("Se calcula solo: Precio por noche × noches. La fecha de salida no cuenta.");
+  sheet.getRange("H1").setNote("Escribe aquí el precio de una noche. El costo final se completa solo.");
 }
 
 function leerPayload(e) {

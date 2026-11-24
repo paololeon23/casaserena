@@ -1,3 +1,4 @@
+import { formMinGuests } from "../config/site";
 import { stayCrossesOccupied } from "./availability";
 import { formatLong, nightsBetween } from "./dates";
 
@@ -49,8 +50,11 @@ export function validateBooking(draft: BookingDraft, today: string): BookingIssu
     issues.push({ field: "checkOut", message: "La fecha de salida no puede estar en el pasado." });
   }
 
-  if (!Number.isInteger(draft.guests) || draft.guests < 2) {
-    issues.push({ field: "guests", message: "El mínimo es 2 personas." });
+  if (!Number.isInteger(draft.guests) || draft.guests < formMinGuests) {
+    issues.push({
+      field: "guests",
+      message: formMinGuests === 1 ? "El mínimo es 1 persona." : `El mínimo es ${formMinGuests} personas.`,
+    });
   } else if (draft.guests > draft.maxGuests) {
     issues.push({
       field: "guests",

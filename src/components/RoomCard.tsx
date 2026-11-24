@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { currency } from "../config/site";
 import { useBooking } from "../context/BookingContext";
+import { amenityIcon } from "../lib/amenities";
 import { formatMoney } from "../lib/booking";
 import type { Room } from "../types";
 import { Lightbox } from "./Lightbox";
@@ -36,40 +37,35 @@ export function RoomCard({ room, mark }: { room: Room; mark: string }) {
           </div>
         )}
       </div>
-      <div className="p-5 sm:p-6 xl:grid xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto] xl:items-end xl:gap-8">
-        <div>
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-ink/70">{room.kind}</p>
-        <h3 className="mt-1 font-display text-[1.7rem] leading-none tracking-[-0.03em]">{room.name}</h3>
-        <p className="mt-3 text-sm leading-relaxed text-ink/70">{room.summary}</p>
+      <div className="grid gap-6 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,1.25fr)_minmax(220px,0.85fr)] xl:items-start xl:gap-8">
+        <div className="min-w-0">
+          <p className="text-sm font-medium uppercase tracking-[0.18em] text-ink/70 sm:text-base">{room.kind}</p>
+          <h3 className="mt-1 font-display text-[2.35rem] leading-none tracking-[-0.03em] sm:text-5xl">{room.name}</h3>
+          <p className="mt-3 text-sm leading-relaxed text-ink/70">{room.summary}</p>
+          <p className="mt-4 text-sm font-medium">
+            {room.capacity == null ? "Capacidad por completar" : `Hasta ${room.capacity} personas`}
+          </p>
         </div>
-        <div>
-        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm xl:mt-0 xl:border-t-0 xl:pt-0">
-          <div>
-            <dt className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink/70">Capacidad</dt>
-            <dd className="mt-1">{room.capacity == null ? "Por completar" : `Hasta ${room.capacity}`}</dd>
-          </div>
-          <div>
-            <dt className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink/70">Cama</dt>
-            <dd className="mt-1">{room.bedType || "Por completar"}</dd>
-          </div>
-        </dl>
-        <div className="mt-4">
-          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink/70">Servicios</p>
+        <div className="min-w-0">
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-ink/70">Tu reserva incluye</p>
           {room.amenities.length > 0 ? (
-            <ul className="mt-2 flex flex-wrap gap-2">
-              {room.amenities.map((item) => (
-                <li key={item} className="rounded-full bg-paper px-3 py-1 text-xs">
-                  {item}
-                </li>
-              ))}
+            <ul className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+              {room.amenities.map((item) => {
+                const Icon = amenityIcon(item.icon);
+                return (
+                  <li key={item.label} className="flex min-w-0 items-center gap-3 text-sm text-ink">
+                    <Icon aria-hidden="true" className="h-5 w-5 shrink-0 text-[#546C4C]" strokeWidth={1.5} />
+                    <span className="min-w-0 leading-snug">{item.label}</span>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="mt-1 text-sm text-ink/70">Por completar</p>
           )}
         </div>
-        </div>
-        <div className="mt-6 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-end sm:justify-between xl:mt-0 xl:flex-col xl:items-stretch xl:border-t-0 xl:pt-0">
-          <div>
+        <div className="flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-end sm:justify-between xl:flex-col xl:items-stretch xl:border-t-0 xl:pt-0">
+          <div className="min-w-0">
             <p className="text-[10px] font-medium uppercase tracking-[0.16em]">La noche</p>
             {room.pricePerNight == null ? (
               <>
@@ -87,7 +83,7 @@ export function RoomCard({ room, mark }: { room: Room; mark: string }) {
           </div>
           <button
             type="button"
-            className="shrink-0 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white"
+            className="w-full shrink-0 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white sm:w-auto xl:w-full"
             onClick={() => booking.consultRoom(room.id)}
           >
             Elegir fechas

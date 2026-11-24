@@ -5,10 +5,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: clip;
   }
 
   body {
-    @apply bg-paper font-sans text-ink antialiased;
+    @apply overflow-x-clip bg-paper font-sans text-ink antialiased;
   }
 
   ::selection {
