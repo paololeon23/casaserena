@@ -113,7 +113,7 @@ export const realRooms: Room[] = [
     isExample: false,
     name: "AURA",
     kind: "Matrimonial",
-    summary: "Habitación cómoda y privada para 2 personas, con cama de 2 plazas y baño privado.",
+    summary: "Un espacio íntimo, privado y acogedor, ideal para desconectarse de la rutina, descansar y compartir momentos especiales en pareja.",
     capacity: 2,
     bedType: "1 cama de 2 plazas",
     amenities: [
@@ -137,7 +137,7 @@ export const realRooms: Room[] = [
     isExample: false,
     name: "ALMA",
     kind: "Doble",
-    summary: "Habitación cómoda y privada para hasta 4 personas, con 2 camas de 2 plazas y baño privado.",
+    summary: "Comparte momentos especiales en un ambiente cómodo, acogedor y pensado para disfrutar en familia.",
     capacity: 4,
     bedType: "2 camas de 2 plazas",
     amenities: [
